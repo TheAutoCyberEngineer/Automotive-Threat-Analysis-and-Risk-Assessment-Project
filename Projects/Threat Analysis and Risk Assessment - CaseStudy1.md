@@ -2,13 +2,21 @@
 
 
 
-##### Case-Study1 Goal
+##### Executive Summary:
 
 
 
-&#x09;	Prevent unauthorized user accounts from being created in the primary owner's vehicle. Even if an external breach occurs via the dealership website, car profiles should be created in an authenticated and authorized 			manner.
+This case study examines a real-world vulnerability in vehicle user profile management, drawn from the 2023 Kia dealership portal compromise documented by Sam Curry (https://samcurry.net/hacking-kia). The core objective is to prevent unauthorized secondary user accounts from being created or elevated to primary owner status, even if an external system (e.g., a dealership website or a connected cloud platform) is compromised. This is a critical control area under ISO/SAE 21434 (Road Vehicles – Cybersecurity Engineering) and UN R155. Proper implementation protects primary owner privacy, vehicle safety, brand reputation, and operational integrity, areas where OEMs face heightened regulatory and customer expectations.
 
-&#x09;	Case-Study1 Ref: *https://samcurry.net/hacking-ki*a
+
+
+##### Case Study Goal
+
+
+
+Prevent unauthorized creation or modification of user accounts in a vehicle’s primary owner profile. Even following a breach of external systems (e.g., dealership portals or mobile apps), all profile changes must require explicit authentication and authorization from the verified primary vehicle owner.
+
+Reference: Sam Curry – Hacking Kia https://samcurry.net/hacking-kia (2023)
 
 
 
@@ -16,68 +24,104 @@
 
 ##### Asset Identification
 
-&#x09;Infotainment Head Unit Memory: This is where:
 
-&#x09;		users' profiles get stored, 
 
-&#x09;		Personalized settings (radio presets, navigation favorites, sound settings, seat memory links, climate preferences, etc.)Paired phones and Bluetooth devices
-
-&#x09;		Cached maps and navigation data
-
-&#x09;		Media libraries, app data, and system files
-
-&#x09;		Call history, contacts (if synced), and recent destinations
+Critical assets include:
 
 
 
-Manufacturer's Storage/ Cloud platform
+Infotainment Head Unit (IHU) Memory:
 
-Primary user enrolls via infotainment screen/ mobile app to set up primary profile and can create a secondary user's account from mobile app, which gets stored on the cloud and synced to infotainment
+Primary and secondary user profiles
+
+Personalized vehicle settings (seats, mirrors, climate, radio presets, navigation favorites)
+
+Paired Bluetooth devices and phones
+
+Cached maps, media libraries, app data, call history, and contacts
+
+System configuration and authentication tokens
+
+
+
+Manufacturer Cloud Platform / Backend:
+
+Primary owner enrollment data (via IHU screen or mobile app)
+
+Secondary user account creation and synchronization logic
+
+Vehicle Identity (VIN) linkage and ownership records
+
+
+
+These assets form the foundation of the vehicle’s digital identity and are high-value targets due to their linkage to both physical vehicle control and owner Personally Identifiable Information (PII).
 
 
 
 ##### Damage Scenario:
 
-&#x09;	DS1: Primary Owner PII stolen and used for malicious activity like fraud or impersonation.
 
-&#x09;	DS2: Primary Owner profile used for malicious accidents remotely, e.g., remotely honking car while driver is in motion can distract the driver and lead to severe accidents affecting the primary stakeholder..
 
-&#x09;	DS3: Damages to OEM sales and brand reputation.
+DS1 – Privacy \& Identity Theft: Primary owner PII is exfiltrated and used for fraud, impersonation, or identity theft across other platforms.
+
+DS2 – Safety Impact: Attacker-created or modified profiles enable remote vehicle interactions (e.g., repeated honking, climate control abuse, or future connected features) that could distract or endanger the legitimate driver, potentially leading to accidents.
+
+DS3 – Business \& Reputational Damage: Erosion of customer trust, regulatory scrutiny, negative media coverage, and financial losses from recalls, legal claims, or lost sales.
+
+
+
+Impact Rating (per ISO/SAE 21434): 4 (Severe) – Affects Safety, Privacy, Financial, and Operational domains.
+
+
 
 ##### Threat Scenario
 
-&#x09;Tampering: Modification of the user's profile data to demote primary owners, create an attacker profile, and set the attacker profile as the primary owner
 
-&#x09;Information Disclosure: Primary vehicle owner PII disclosed and used for fraudulent activities on other platforms like social media, bank.
 
-&#x09;Elevation of Privileges: gaining admin privileges to set themselves as a primary owner without any authentication from primary vehicle owner or authorization 		
+Tampering: Unauthorized modification of profile data to demote the legitimate primary owner and promote an attacker-controlled account.
+
+Information Disclosure: Exposure of owner PII leading to secondary attacks.
+
+Privilege Escalation: Gaining administrative rights to create or alter ownership without the primary owner's consent.
+
+
 
 
 
 ##### Attack Model
 
-&#x09;	https://attack.mitre.org/techniques/T1531/
+
+
+MITRE ATT\&CK: T1531 – Account Access Removal (adapted to automotive context: ownership demotion/escalation).
 
 
 
 ##### Attack Paths
 
-&#x09;Path 1: Dealership website as shown in the original case study - Lack of authentication and authorization led to wide access to customers' VINs.
 
-&#x09;Path2: Customer's email and phone details can be obtained from other platforms. A presence of MFA via owner's phone, email or  token provided by KIA would have prevented the creation of a secondary user without the owner's awareness and most importantly, not provided the attacker the capability of demoting the primary vehicle owner.
+
+Path 1 (Documented): Compromised dealership website → Lack of proper authentication/authorization → Direct access to customer VINs and profile management functions.
+
+Path 2 (Extended): Attacker obtains owner email/phone from secondary breaches → Abuses weak or absent MFA during secondary account creation → Demotes primary owner and elevates their own profile.
+
+
+
+Key Insight for Experts: Modern vehicles operate in a complex supply chain ecosystem (OEM cloud → dealership systems → Tier-1 head unit → mobile app). A break anywhere in the chain can propagate if identity and access management (IAM) is not consistently enforced end-to-end.
 
 
 
 #### Risk Assessment
 
-&#x09;Answers the question: How feasible is this attack? What's the impact level if attacked (impact areas include Financial, Safety, Operational, Privacy)?
 
-&#x09;	
+
+Using a standard 5x5 risk matrix (Feasibility × Impact)	
+
+
 
 |Risk Matrix|Attack Feasibility|0|1|2|3|4|
 |-|-|-|-|-|-|-|
 |Impact|0|0 - Low|0 - Low|0 - Low|0 - Low|0 - Low|
-||1|0 - Low|1 - Low|2 - Low|3 - Low|4 - High |
+||1|0 - Low|1 - Low|2 - Low|3 - Low|4 - High|
 ||2|0 - Low|2 - Low|4 - Medium|6 - Medium|8 - High|
 ||3|0 - Low|3 - Low|6 - Medium|9 - High|12 - High|
 ||4|0 - Low|4 - Medium|8 - High|12 - High|16 - Critical|
@@ -94,11 +138,9 @@ O - 3 == Low
 
 
 
-In this case, based on the damage scenarios, Impact can affect the safety, privacy, and financial areas for the primary stakeholder(s) in accordance with ISO/SAE 21434.
+Impact: Rated 4 (Safety, Privacy, Financial consequences align with ISO/SAE 21434 severe classification).
 
-The impact, therefore, would be rated 4
-
-The Attack Feasibility will require sophisticated knowledge in Web, App, IAM, APIs, to perform actions on delearship website or OEM application for the creation and demotion of primary user's account. This would be rated 4, because this knowledge is readily available to multiple people in the Information Technology Industry.
+Attack Feasibility: Rated 4 – Requires web/app/API/IAM knowledge that is widespread among skilled adversaries.
 
 
 
@@ -110,5 +152,27 @@ The Attack Feasibility will require sophisticated knowledge in Web, App, IAM, AP
 
 
 
-Risk Mitigation  - This needs to be mitigated by implementing Multifactor Authentication for Vehicle Owners before creating a secondary account profile. This would bottle neck any external threats that occurs from the dealership website.
+Primary Mitigation: Implement strong Multi-Factor Authentication (MFA) tied to the primary vehicle owner’s identity before any secondary account creation, ownership changes, or demotion actions. This should be enforced at both the cloud/backend and infotainment synchronization layers.
+
+
+
+Defense-in-Depth Layers:
+
+
+
+Authentication: Hardware-backed keys, FIDO2/WebAuthn, or vehicle-bound cryptographic challenges.
+
+Authorization: Role-Based Access Control (RBAC) + Attribute-Based Access Control (ABAC) with explicit primary-owner consent workflows.
+
+Monitoring \& Detection: Anomalous profile changes (e.g., sudden demotion of primary owner) trigger alerts and temporary vehicle lockdowns.
+
+Secure Design: Least-privilege principles, input validation, and session management across all external interfaces (dealership portals, mobile apps, APIs).
+
+Testing: Continuous penetration testing of the full attack surface. Include red-team exercises simulating dealership breaches.
+
+Compliance: Align with ISO/SAE 21434, UN R155/R156, and emerging regulations.
+
+
+
+Verification Suggestion: After implementation, verify that even with a full compromise of the dealership portal, an attacker cannot create or elevate accounts without primary owner MFA approval.
 
